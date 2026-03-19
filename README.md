@@ -64,3 +64,34 @@ webapp/src/
 - Card persistence (save/load from database)
 - Multi-card PDF portfolio compiler (M&M Bestiary)
 - Game table mode with WebSocket sync
+
+## Railway Deployment
+
+This monorepo deploys as **two separate Railway services** — one for the backend API and one for the frontend webapp.
+
+### Setup
+
+1. **Create a new Railway project** with two services:
+   - **Backend service** — set the root directory to `/backend`
+   - **Frontend service** — set the root directory to `/webapp`
+
+2. **Add a Railway Postgres plugin** and connect it to the backend service. Railway auto-injects `DATABASE_URL`.
+
+3. **Backend env vars:**
+   - `PORT` — Railway sets this automatically
+   - `RAILWAY_PUBLIC_DOMAIN` — (optional) auto-set by Railway, used for CORS
+
+4. **Frontend env vars:**
+   - `VITE_API_URL` — set to the backend service's Railway URL (e.g. `https://your-backend.up.railway.app`) after the first deploy
+
+5. **Database migrations:** Run the following as a Railway deploy command for the backend service:
+   ```
+   bunx prisma migrate deploy
+   ```
+
+### How It Works
+
+- Both services use Dockerfiles (`backend/Dockerfile`, `webapp/Dockerfile`)
+- The backend runs Hono on Bun with Prisma (PostgreSQL)
+- The frontend builds with Vite and is served as static files via `serve`
+- CORS is configured to accept `*.railway.app` and `*.up.railway.app` origins

@@ -9,7 +9,7 @@ const cardsRouter = new Hono();
 cardsRouter.get("/", async (c) => {
   const cards = await db.card.findMany({ orderBy: { updatedAt: "desc" } });
   return c.json({
-    data: cards.map((card) => ({
+    data: cards.map((card: { data: string; createdAt: Date; updatedAt: Date }) => ({
       ...card,
       data: JSON.parse(card.data),
       createdAt: card.createdAt.toISOString(),

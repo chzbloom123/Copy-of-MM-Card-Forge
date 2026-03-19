@@ -1,4 +1,3 @@
-import "@vibecodeapp/proxy"; // DO NOT REMOVE OTHERWISE VIBECODE PROXY WILL NOT WORK
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import "./env";
@@ -9,15 +8,16 @@ import { logger } from "hono/logger";
 const app = new Hono();
 
 // CORS middleware - validates origin against allowlist
-const allowed = [
+const allowed: RegExp[] = [
   /^http:\/\/localhost(:\d+)?$/,
   /^http:\/\/127\.0\.0\.1(:\d+)?$/,
-  /^https:\/\/[a-z0-9-]+\.dev\.vibecode\.run$/,
-  /^https:\/\/[a-z0-9-]+\.vibecode\.run$/,
-  /^https:\/\/[a-z0-9-]+\.vibecodeapp\.com$/,
-  /^https:\/\/[a-z0-9-]+\.vibecode\.dev$/,
-  /^https:\/\/vibecode\.dev$/,
+  /^https:\/\/[a-z0-9-]+\.railway\.app$/,
+  /^https:\/\/[a-z0-9-]+\.up\.railway\.app$/,
 ];
+
+if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+  allowed.push(new RegExp(`^https://${process.env.RAILWAY_PUBLIC_DOMAIN}$`));
+}
 
 app.use(
   "*",
